@@ -11,7 +11,7 @@ function processData(data, key){
     if(!data){
         return  (key+"::"+TIMERCOUNT);
     }
-    
+
     var i=0, d, len, count=0, found = false;
     d = data.split("|$|");
     len = d.length;
@@ -38,7 +38,7 @@ function getCurrentTabInfo() {
             var key = tabs[0].url;
             if(!key) return;
             key = getHost(key).origin;
-            
+            key = key+"$$"+tabs[0].favIconUrl;
             currentValue = processData(currentValue, key);
             
             chrome.storage.local.set({ key : currentValue }, function () {});
