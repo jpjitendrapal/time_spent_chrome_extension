@@ -16,15 +16,16 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
                 // storageChange.oldValue
 
                 var sites = storageChange.newValue.split('|$|');
-                var len = sites.length-1, info, url, icon;
+                var len = sites.length-1, info, url, icon, time;
                 for(var i = len; i >= 0; i--){
                   info = sites[i].split('::');
-                  url = info[0].split("$$")[0];
-                  icon = info[0].split("$$")[1];
+                  url = info[0];
+                  time = info[1].split("$$")[0];
+                  icon = info[1].split("$$")[1];
                   if(url.indexOf("chrome://newtab") == 0 || url.startsWith("null")){
                     continue;
                   }
-                  _htm += '<tr class="site-item"><td class="site"><img class="site-icon" src="' + icon +  '"/> &nbsp;'+ url + '</td> <td class="time">' + getTimeFromSec(info[1]) + '</td></tr>';    
+                  _htm += '<tr class="site-item"><td class="site"><img class="site-icon" src="' + icon +  '"/> &nbsp;'+ url + '</td> <td class="time">' + getTimeFromSec(time) + '</td></tr>';    
                 }
   }
 

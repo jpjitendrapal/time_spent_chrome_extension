@@ -1,4 +1,5 @@
 var TIMERCOUNT = 2;
+var USERDATA = {};
 
 function getHost(url){
     var location = document.createElement("a");
@@ -6,7 +7,7 @@ function getHost(url){
     return location;
 }
 
-function processData(data, key){
+function processData(data, key, icon){
     
     if(!data){
         return  (key+"::"+TIMERCOUNT);
@@ -19,7 +20,7 @@ function processData(data, key){
         if(d[i].indexOf(key) == 0){
             count = d[i].split("::")[1];
             d.splice(i, 1);
-            d.push(key + "::" + (TIMERCOUNT + parseInt(count)));
+            d.push(key + "::" + (TIMERCOUNT + parseInt(count)) + "$$" +icon );
             found = true;
             break;
         }
@@ -31,15 +32,15 @@ function processData(data, key){
     return data;
 }
 function getCurrentTabInfo() {
-    var currentValue;
+    var currentValue, icon;
     setInterval(function () {
         chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
             if(tabs.length < 1) return;
             var key = tabs[0].url;
             if(!key) return;
             key = getHost(key).origin;
-            key = key+"$$"+tabs[0].favIconUrl;
-            currentValue = processData(currentValue, key);
+            icon = tabs[0].favIconUrl;
+            currentValue = processData(currentValue, key, icon);
             
             chrome.storage.local.set({ key : currentValue }, function () {});
         });
