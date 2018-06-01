@@ -1,5 +1,11 @@
 var TIMERCOUNT = 2;
-var USERDATA = {};
+var USERDATA = {
+    webInfo: []
+};
+var FILTERURLS = [
+    "fb.com",
+    "newtab"
+];
 
 function getHost(url){
     var location = document.createElement("a");
@@ -7,41 +13,40 @@ function getHost(url){
     return location;
 }
 
-function processData(data, key, icon){
-    
-    if(!data){
-        return  (key+"::"+TIMERCOUNT);
-    }
+function filterUrl(url){
+    return (FILTERURLS.indexOf(url) > -1);
+}
 
-    var i=0, d, len, count=0, found = false;
-    d = data.split("|$|");
-    len = d.length;
-    for(i=0; i < len; i++){
-        if(d[i].indexOf(key) == 0){
-            count = d[i].split("::")[1];
-            d.splice(i, 1);
-            d.push(key + "::" + (TIMERCOUNT + parseInt(count)) + "$$" +icon );
-            found = true;
-            break;
+function updateInfo(host, icon){
+    if(filterUrl(host)){
+        return;
+    }
+    if(!USERDATA.webInfo[host]){
+        USERDATA.webInfo[host] = {
+            icon: icon,
+            time: TIMERCOUNT
+        }
+    } else {
+        USERDATA.webInfo[host].time += TIMERCOUNT;
+        if(icon){
+            USERDATA.webInfo[host].icon = icon;
         }
     }
-    if(!found){
-        d.push(key+"::"+TIMERCOUNT);
-    }
-    data = d.join("|$|");
-    return data;
 }
 function getCurrentTabInfo() {
-    var currentValue, icon;
+    var currentValue=0, icon;
     setInterval(function () {
         chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
             if(tabs.length < 1) return;
             var key = tabs[0].url;
             if(!key) return;
-            key = getHost(key).origin;
+            key = getHost(key).host;
             icon = tabs[0].favIconUrl;
-            currentValue = processData(currentValue, key, icon);
-            
+            updateInfo(key,icon);
+            currentValue++;
+            if(currentValue > 100){
+                currentValue = 0;
+            }
             chrome.storage.local.set({ key : currentValue }, function () {});
         });
     }, 1000*TIMERCOUNT);

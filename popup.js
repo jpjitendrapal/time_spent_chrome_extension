@@ -1,4 +1,6 @@
 
+var background = chrome.extension.getBackgroundPage();
+
 function getTimeFromSec(sec){
   var d = Number(sec);
   var h = Math.floor(d / 3600);
@@ -8,29 +10,15 @@ function getTimeFromSec(sec){
 }
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   var _htm = '<table class="site-items" border="1">';
-
   _htm += '<tr class="site-item"><th class="site"><b>Site</b></th> <th class="time"><b>Time Spent</b></th></tr>';
 
-  for (key in changes) {
-    var storageChange = changes[key];
-                // storageChange.oldValue
-
-                var sites = storageChange.newValue.split('|$|');
-                var len = sites.length-1, info, url, icon, time;
-                for(var i = len; i >= 0; i--){
-                  info = sites[i].split('::');
-                  url = info[0];
-                  time = info[1].split("$$")[0];
-                  icon = info[1].split("$$")[1];
-                  if(url.indexOf("chrome://newtab") == 0 || url.startsWith("null")){
-                    continue;
-                  }
-                  _htm += '<tr class="site-item"><td class="site"><img class="site-icon" src="' + icon +  '"/> &nbsp;'+ url + '</td> <td class="time">' + getTimeFromSec(time) + '</td></tr>';    
-                }
+  console.log(background.USERDATA);
+  var webInfo = background.USERDATA.webInfo;
+  for(key in webInfo){
+    _htm += '<tr class="site-item"><td class="site"><img class="site-icon" src="' + webInfo[key].icon +  '"/> &nbsp;'+ key + '</td> <td class="time">' + getTimeFromSec(webInfo[key].time) + '</td></tr>';
   }
-
   _htm += '</table>'
+  document.getElementById("current-tab").innerHTML = _htm;
 
-  document.getElementById('current-tab').innerHTML = _htm;
 });
 

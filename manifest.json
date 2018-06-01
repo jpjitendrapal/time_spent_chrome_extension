@@ -9,7 +9,7 @@
         "default_title": "Have a tracker on time spent on sites"
     },
     "chrome_url_overrides": {
-        // "newtab": "newtab.html"
+        "newtab": "newtab.html"
     },
     "permissions": [
         "activeTab",
